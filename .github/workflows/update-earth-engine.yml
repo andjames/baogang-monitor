@@ -1,0 +1,62 @@
+name: Update Earth Engine Data
+
+# When should this run?
+on:
+  # Run every 6 hours
+  schedule:
+    - cron: '0 */6 * * *'
+  
+  # Also run when you push to main branch
+  push:
+    branches: [main]
+  
+  # Allow manual trigger from GitHub UI
+  workflow_dispatch:
+
+# What should it do?
+jobs:
+  update-data:
+    runs-on: ubuntu-latest
+    
+    steps:
+    # 1. Get your code
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    # 2. Set up Python
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+    
+    # 3. Install Earth Engine
+    - name: Install dependencies
+      run: |
+        pip install earthengine-api
+    
+    # 4. Create credentials file from secret
+    - name: Authenticate Earth Engine
+      env:
+        EE_CREDENTIALS: ${{ secrets.EE_SERVICE_ACCOUNT_JSON }}
+      run: |
+        echo "$EE_CREDENTIALS" > $HOME/ee-credentials.json
+    
+    # 5. Run your Python script
+    - name: Fetch latest data
+      env:
+        GOOGLE_APPLICATION_CREDENTIALS: $HOME/ee-credentials.json
+      run: python scripts/update_metrics.py
+    
+    # 6. Clean up credentials
+    - name: Remove credentials
+      if: always()
+      run: rm -f $HOME/ee-credentials.json
+    
+    # 7. Commit changes back to repo
+    - name: Commit data
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add data/
+        git commit -m "Update Earth Engine data" || echo "No changes"
+        git push
