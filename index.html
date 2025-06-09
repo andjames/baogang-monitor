@@ -232,8 +232,8 @@
             <div class="metrics">
                 <div class="metric">
                     <div class="metric-label">Moisture Index</div>
-                    <div class="metric-value">-0.038</div>
-                    <div class="metric-change change-negative">↓ 340% vs 2024</div>
+                    <div class="metric-value" id="ndmi-value">-0.038</div>
+                    <div class="metric-change" id="ndmi-change">↓ 340% vs 2024</div>
                 </div>
                 <div class="metric">
                     <div class="metric-label">Bare Soil</div>
@@ -248,7 +248,6 @@
                 <div class="metric">
                     <div class="metric-label">Snow Cover</div>
                     <div class="metric-value">None</div>
-                    <div class="metric-change change-negative">First time on record</div>
                 </div>
             </div>
             
@@ -293,6 +292,7 @@
     </div>
     
     <script>
+
         // Initialize map
         const map = L.map('map').setView([40.6589, 109.8405], 11);
         
@@ -378,14 +378,67 @@
                 }
             }
         });
-        
-        // Simulate real-time updates
-        let updateCount = 0;
-        setInterval(() => {
-            updateCount++;
-            document.querySelector('.header p').innerHTML = 
-                `Real-time environmental monitoring using Sentinel-2 satellite data | Last sync: ${new Date().toLocaleTimeString()}`;
-        }, 30000);
+
+        // Function to load Earth Engine data
+        async function loadEarthEngineData() {
+            try {
+                // Add timestamp to prevent caching
+                const response = await fetch('./data/latest_metrics.json?t=' + Date.now());
+                const data = await response.json();
+                
+                // Update metric displays
+                document.querySelector('#ndvi-value').textContent = data.metrics.ndvi.toFixed(3);
+                document.querySelector('#ndmi-value').textContent = data.metrics.ndmi.toFixed(3);
+                document.querySelector('#bsi-value').textContent = data.metrics.bsi.toFixed(3);
+                
+                // Update percentage changes (these are in your JSON)
+                document.querySelector('#ndvi-change').textContent = data.changes_vs_2024.ndvi;
+                document.querySelector('#ndmi-change').textContent = data.changes_vs_2024.ndmi;
+                document.querySelector('#bsi-change').textContent = data.changes_vs_2024.bsi;
+                
+                // Update last update time
+                const updateTime = new Date(data.timestamp);
+                document.querySelector('.last-update').textContent = 
+                    `Last updated: ${updateTime.toLocaleString()} (Image: ${data.image_date})`;
+                
+                // Add update animation
+                document.querySelectorAll('.metric').forEach(el => {
+                    el.classList.add('flash');
+                    setTimeout(() => el.classList.remove('flash'), 1000);
+                });
+                
+            } catch (error) {
+                console.error('Error loading Earth Engine data:', error);
+                // Fall back to demo data if needed
+            }
+        }
+
+        // Load data on page load
+        loadEarthEngineData();
+
+        // Reload every 5 minutes
+        setInterval(loadEarthEngineData, 5 * 60 * 1000);
+
+        // Add CSS for flash animation
+        const style = document.createElement('style');
+        style.textContent = `
+            .metric.flash {
+                animation: flash 1s ease-in-out;
+            }
+            @keyframes flash {
+                0%, 100% { opacity: 1; }
+                50% { opacity: 0.5; background-color: #444; }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // // Simulate real-time updates
+        // let updateCount = 0;
+        // setInterval(() => {
+        //     updateCount++;
+        //     document.querySelector('.header p').innerHTML = 
+        //         `Real-time environmental monitoring using Sentinel-2 satellite data | Last sync: ${new Date().toLocaleTimeString()}`;
+        // }, 30000);
     </script>
 </body>
 </html>
