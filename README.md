@@ -31,22 +31,12 @@ Baogang is home to one of the world’s largest rare earth processing facilities
 - [Chart.js](https://www.chartjs.org/) – for plotting time-series trends  
 - HTML, CSS, JavaScript – frontend
 
-## 📁 Project Structure
-
-/
-├── data/               # JSON or CSV exports from Earth Engine
-├── scripts/            # GEE export scripts and GitHub Actions
-├── public/             # HTML/CSS/JS files for the dashboard
-│   ├── index.html
-├── .github/workflows/  # CI scripts for automated updates
-└── README.md #you're here!
-
 ## 🔄 How It Works
-GEE scripts export environmental index data for Baogang and a reference region.
+1) GEE scripts export environmental index data on a regular schedule for Baogang and a reference region.
 
-GitHub Actions runs on a schedule, fetching and updating the dataset.
+2) GitHub Actions runs on a schedule, fetching and updating the dataset.
 
-The dashboard loads the latest dataset and displays it via Leaflet and Chart.js.
+3) The dashboard loads the latest dataset and displays it via Leaflet and Chart.js.
 
 ## 🚧 Future Ideas
 Add more historical imagery comparisons
