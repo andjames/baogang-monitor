@@ -3,7 +3,7 @@
 This is a lightweight demo dashboard that uses **Google Earth Engine (GEE)** data to visualize environmental changes around the **Baogang Rare Earth Processing Plant** in Inner Mongolia, China. The dashboard includes reference plots from a nearby, comparatively undisturbed area for baseline comparison.
 
 
-Demo link: (Baogang Monitor)[https://andjames.github.io/baogang-monitor/]
+Demo link: [Baogang Monitor](https://andjames.github.io/baogang-monitor/)
 
 ## 🌍 Features
 
