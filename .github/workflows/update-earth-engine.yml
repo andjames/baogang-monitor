@@ -1,62 +1,62 @@
 name: Update Earth Engine Data
 
-# When should this run?
 on:
-  # Run every 6 hours
   schedule:
-    - cron: '0 */6 * * *'
-  
-  # Also run when you push to main branch
+    - cron: '0 */6 * * *'  # Every 6 hours
+  workflow_dispatch:  # Allow manual trigger
   push:
-    branches: [main]
-  
-  # Allow manual trigger from GitHub UI
-  workflow_dispatch:
+    branches:
+      - main
+    paths:
+      - 'scripts/update_metrics.py'
 
-# What should it do?
 jobs:
   update-data:
     runs-on: ubuntu-latest
     
     steps:
-    # 1. Get your code
-    - name: Checkout code
+    - name: Checkout repository
       uses: actions/checkout@v3
-    
-    # 2. Set up Python
-    - name: Setup Python
+      
+    - name: Set up Python
       uses: actions/setup-python@v4
       with:
         python-version: '3.9'
-    
-    # 3. Install Earth Engine
+        
+    - name: Cache dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+        
     - name: Install dependencies
       run: |
-        pip install earthengine-api
-    
-    # 4. Create credentials file from secret
-    - name: Authenticate Earth Engine
+        pip install earthengine-api pandas
+        
+    - name: Create credentials file
       env:
-        EE_CREDENTIALS: ${{ secrets.EE_SERVICE_ACCOUNT_JSON }}
+        EE_SERVICE_ACCOUNT_JSON: ${{ secrets.EE_SERVICE_ACCOUNT_JSON }}
       run: |
-        echo "$EE_CREDENTIALS" > $HOME/ee-credentials.json
-    
-    # 5. Run your Python script
-    - name: Fetch latest data
+        echo "$EE_SERVICE_ACCOUNT_JSON" > /tmp/ee-credentials.json
+        
+    - name: Check credentials file (debug)
+      run: |
+        echo "Checking if credentials file exists..."
+        ls -la /tmp/ee-credentials.json || echo "File not found!"
+        echo "GOOGLE_APPLICATION_CREDENTIALS will be set to: /tmp/ee-credentials.json"
+        
+    - name: Run Earth Engine script
       env:
-        GOOGLE_APPLICATION_CREDENTIALS: $HOME/ee-credentials.json
+        GOOGLE_APPLICATION_CREDENTIALS: /tmp/ee-credentials.json
       run: python scripts/update_metrics.py
-    
-    # 6. Clean up credentials
+      
     - name: Remove credentials
       if: always()
-      run: rm -f $HOME/ee-credentials.json
-    
-    # 7. Commit changes back to repo
-    - name: Commit data
+      run: rm -f /tmp/ee-credentials.json
+      
+    - name: Commit and push if changed
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
-        git add data/
-        git commit -m "Update Earth Engine data" || echo "No changes"
-        git push
+        git add -A
+        git diff --quiet && git diff --staged --quiet || (git commit -m "Update Earth Engine data - $(date +'%Y-%m-%d %H:%M:%S')" && git push)
