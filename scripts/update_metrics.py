@@ -112,6 +112,21 @@ def main():
         if os.path.exists(historical_path):
             with open(historical_path, 'r') as f:
                 historical = json.load(f)
+            if 'main_plant' not in historical:
+                historical['main_plant'] = {
+                     "2024": {
+                        "months": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+                        "ndvi": [0.019, 0.047, 0.090, 0.134, 0.188, 0.200, 0.207, 0.237, 0.234, 0.199, 0.120, 0.096],
+                        "ndmi": [0.298, 0.290, -0.047, -0.021, 0.009, 0.021, 0.035, 0.067, 0.055, 0.040, -0.003, -0.007],
+                        "bsi": [-0.127, -0.115, 0.089, 0.071, 0.047, 0.039, 0.031, 0.002, 0.008, 0.015, 0.037, 0.041]
+                    },
+                    "2025": {
+                        "months": ["Jan", "Feb", "Mar", "Apr", "May"],
+                        "ndvi": [0.089, 0.102, 0.099, 0.125, 0.206],
+                        "ndmi": [-0.012, -0.041, -0.041, -0.049, 0.024],
+                        "bsi": [0.044, 0.071, 0.074, 0.096, 0.029]
+                    }
+                }
         else:
             # Initialize if doesn't exist
             historical = {
