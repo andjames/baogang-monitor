@@ -91,28 +91,70 @@ def get_latest_metrics():
             'bsi': '+76.2%'
         }
     }
+    
 
 def main():
     """Main execution"""
     print("🚀 Fetching latest Baogang metrics...")
     
     try:
-        # Get data
+        # Get current data
         data = get_latest_metrics()
         
-        # Ensure directory exists
+        # Save current metrics
         os.makedirs('data', exist_ok=True)
-        
-        # Save to file
         with open('data/latest_metrics.json', 'w') as f:
             json.dump(data, f, indent=2)
         
-        print(f"✅ Updated metrics:")
-        print(f"   Image date: {data['image_date']}")
-        print(f"   NDVI: {data['metrics']['ndvi']}")
-        print(f"   NDMI: {data['metrics']['ndmi']}")
-        print(f"   BSI: {data['metrics']['bsi']}")
-        print(f"✅ Saved to data/latest_metrics.json")
+        # UPDATE HISTORICAL DATA HERE
+        # Load existing historical data
+        historical_path = 'data/historical_monthly.json'
+        if os.path.exists(historical_path):
+            with open(historical_path, 'r') as f:
+                historical = json.load(f)
+        else:
+            # Initialize if doesn't exist
+            historical = {
+                "main_plant": {
+                    "2024": {
+                        "months": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+                        "ndvi": [0.019, 0.047, 0.090, 0.134, 0.188, 0.200, 0.207, 0.237, 0.234, 0.199, 0.120, 0.096],
+                        "ndmi": [0.298, 0.290, -0.047, -0.021, 0.009, 0.021, 0.035, 0.067, 0.055, 0.040, -0.003, -0.007],
+                        "bsi": [-0.127, -0.115, 0.089, 0.071, 0.047, 0.039, 0.031, 0.002, 0.008, 0.015, 0.037, 0.041]
+                    },
+                    "2025": {
+                        "months": ["Jan", "Feb", "Mar", "Apr", "May"],
+                        "ndvi": [0.089, 0.102, 0.099, 0.125, 0.206],
+                        "ndmi": [-0.012, -0.041, -0.041, -0.049, 0.024],
+                        "bsi": [0.044, 0.071, 0.074, 0.096, 0.029]
+                    }
+                }
+            }
+        
+        # Update current month
+        current_month = datetime.now().strftime('%b')
+        current_year = str(datetime.now().year)
+        
+        if current_year in historical['main_plant']:
+            year_data = historical['main_plant'][current_year]
+            if current_month in year_data['months']:
+                # Update existing month
+                idx = year_data['months'].index(current_month)
+                year_data['ndvi'][idx] = data['metrics']['ndvi']
+                year_data['ndmi'][idx] = data['metrics']['ndmi']
+                year_data['bsi'][idx] = data['metrics']['bsi']
+            else:
+                # Add new month
+                year_data['months'].append(current_month)
+                year_data['ndvi'].append(data['metrics']['ndvi'])
+                year_data['ndmi'].append(data['metrics']['ndmi'])
+                year_data['bsi'].append(data['metrics']['bsi'])
+        
+        # Save updated historical data
+        with open(historical_path, 'w') as f:
+            json.dump(historical, f, indent=2)
+        
+        print("✅ Updated historical data")
         
     except Exception as e:
         print(f"❌ Error: {e}")
