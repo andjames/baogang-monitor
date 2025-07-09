@@ -410,6 +410,50 @@
             }
         });
 
+        // Function to load historical monthly NDMI data and update the chart
+        async function loadHistoricalData() {
+            try {
+                const response = await fetch('./data/historical_monthly.json?t=' + Date.now());
+                const json = await response.json();
+
+                // Prefer root level main_plant object if present
+                const plantData = json.main_plant || (json.historical_monthly && json.historical_monthly.main_plant) || {};
+                const years = Object.keys(plantData).sort();
+                if (years.length === 0) return;
+
+                // Use months from the first year as labels
+                const labels = plantData[years[0]].months;
+                timeChart.data.labels = labels;
+
+                const colors = [
+                    { border: '#4a9eff', background: 'rgba(74, 158, 255, 0.1)' },
+                    { border: '#ff4444', background: 'rgba(255, 68, 68, 0.1)' },
+                    { border: '#44ff44', background: 'rgba(68, 255, 68, 0.1)' }
+                ];
+
+                timeChart.data.datasets = years.map((yr, idx) => {
+                    const yearMonths = plantData[yr].months;
+                    const ndmi = plantData[yr].ndmi;
+                    const data = labels.map(m => {
+                        const i = yearMonths.indexOf(m);
+                        return i !== -1 ? ndmi[i] : null;
+                    });
+                    const c = colors[idx % colors.length];
+                    return {
+                        label: `${yr} Moisture Index`,
+                        data,
+                        borderColor: c.border,
+                        backgroundColor: c.background,
+                        tension: 0.3
+                    };
+                });
+
+                timeChart.update();
+            } catch (err) {
+                console.error('Error loading historical data:', err);
+            }
+        }
+
         // Function to load Earth Engine data
         async function loadEarthEngineData() {
             try {
@@ -446,9 +490,11 @@
 
         // Load data on page load
         loadEarthEngineData();
+        loadHistoricalData();
 
         // Reload every 5 minutes
         setInterval(loadEarthEngineData, 5 * 60 * 1000);
+        setInterval(loadHistoricalData, 5 * 60 * 1000);
 
         // Add CSS for flash animation
         const style = document.createElement('style');
@@ -471,5 +517,4 @@
         //         `Real-time environmental monitoring using Sentinel-2 satellite data | Last sync: ${new Date().toLocaleTimeString()}`;
         // }, 30000);
     </script>
-</body>
-</html>
+</body></html>
