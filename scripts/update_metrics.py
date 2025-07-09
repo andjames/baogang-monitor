@@ -6,7 +6,7 @@ update_metrics.py - Fixed version for GitHub Actions
 import ee
 import json
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 
 # Initialize Earth Engine
 try:
@@ -40,12 +40,18 @@ def get_latest_metrics():
     point = ee.Geometry.Point([109.8405, 40.6589])
     region = point.buffer(5000)
     
+    # Determine date range (last 30 days)
+    end_date = datetime.utcnow().date()
+    start_date = end_date - timedelta(days=30)
+    start_str = start_date.strftime('%Y-%m-%d')
+    end_str = end_date.strftime('%Y-%m-%d')
+
     # Get latest Sentinel-2 image
-    image = ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED') \
-        .filterBounds(region) \
-        .filterDate('2025-05-01', '2025-06-30') \
-        .sort('system:time_start', False) \
-        .first()
+    image = (ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED')
+        .filterBounds(region)
+        .filterDate(start_str, end_str)
+        .sort('system:time_start', False)
+        .first())
     
     # Calculate indices
     ndvi = image.normalizedDifference(['B8', 'B4'])
