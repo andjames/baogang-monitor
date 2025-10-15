@@ -318,16 +318,10 @@
             <h2>Historical Metric Trends</h2>
             <div class="mini-charts">
                 <div class="mini-chart">
-                    <canvas id="moistureChart"></canvas>
-                </div>
-                <div class="mini-chart">
                     <canvas id="bareSoilChart"></canvas>
                 </div>
                 <div class="mini-chart">
                     <canvas id="vegetationChart"></canvas>
-                </div>
-                <div class="mini-chart">
-                    <canvas id="snowChart"></canvas>
                 </div>
             </div>
         </div>
@@ -475,22 +469,8 @@
             });
         }
 
-        const moistureChart = createMetricChart('moistureChart', 'Moisture Index');
         const bareSoilChart = createMetricChart('bareSoilChart', 'Bare Soil Index');
         const vegetationChart = createMetricChart('vegetationChart', 'Vegetation Health (NDVI)');
-        const snowChart = createMetricChart('snowChart', 'Snow Cover Presence', {
-            scales: {
-                y: {
-                    ...chartOptions.scales.y,
-                    suggestedMin: -0.1,
-                    suggestedMax: 1.1,
-                    ticks: {
-                        ...chartOptions.scales.y.ticks,
-                        callback: (value) => (value === 1 ? 'Present' : value === 0 ? 'Absent' : value)
-                    }
-                }
-            }
-        });
 
         // Function to load historical monthly NDMI data and update the chart
         async function loadHistoricalData() {
@@ -527,7 +507,6 @@
                 timeChart.update();
 
                 const metricConfigs = [
-                    { key: 'ndmi', chart: moistureChart, label: 'Moisture Index' },
                     { key: 'bsi', chart: bareSoilChart, label: 'Bare Soil Index' },
                     { key: 'ndvi', chart: vegetationChart, label: 'Vegetation Health' }
                 ];
@@ -554,23 +533,6 @@
                     chart.update();
                 });
 
-                const snowPeriods = (json.annotations && json.annotations.snow_period) || {};
-                snowChart.data.labels = labels;
-                snowChart.data.datasets = years.map((yr, idx) => {
-                    const snowMonths = snowPeriods[yr] || [];
-                    const data = labels.map(m => snowMonths.includes(m) ? 1 : 0);
-                    const c = chartPalette[idx % chartPalette.length];
-                    return {
-                        label: `${yr} Snow Cover`,
-                        data,
-                        borderColor: c.border,
-                        backgroundColor: c.background,
-                        stepped: true,
-                        tension: 0,
-                        spanGaps: true
-                    };
-                });
-                snowChart.update();
             } catch (err) {
                 console.error('Error loading historical data:', err);
             }
