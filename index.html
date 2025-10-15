@@ -324,6 +324,7 @@
 
         <div class="card metrics-card">
             <h2>Key Environmental Metrics</h2>
+            <p style="margin-top: -0.5rem; margin-bottom: 1rem; color: #9aa4b1; font-size: 0.95rem;">Sentinel-2 indices sampled over the Baogang tailings dam (40.6355°N, 109.6851°E).</p>
             <div class="key-metrics-content">
                 <div class="key-metrics-panel">
                     <div class="metrics">
@@ -332,7 +333,7 @@
                             Moisture Index
                             <span class="info" title="NDMI (Normalized Difference Moisture Index) estimates vegetation water content. Range: -1 (dry) to 1 (wet).">ⓘ</span>
                           </div>
-                          <div class="metric-value" id="ndmi-value">-0.038</div>
+                          <div class="metric-value" id="ndmi-value">-0.189</div>
                           <div class="metric-change" id="ndmi-change"></div>
                         </div>
 
@@ -341,7 +342,7 @@
                             Bare Soil
                             <span class="info" title="BSI (Bare Soil Index) highlights exposed soil using visible and SWIR bands. Higher values = more bare ground.">ⓘ</span>
                           </div>
-                          <div class="metric-value" id="bsi-value">0.084</div>
+                          <div class="metric-value" id="bsi-value">0.481</div>
                           <div class="metric-change" id="bsi-change"></div>
                         </div>
 
@@ -350,7 +351,7 @@
                             Vegetation Health
                             <span class="info" title="NDVI (Normalized Difference Vegetation Index) indicates plant greenness. Range: -1 to 1, with 0.2–0.8 = healthy vegetation.">ⓘ</span>
                           </div>
-                          <div class="metric-value" id="ndvi-value">0.129</div>
+                          <div class="metric-value" id="ndvi-value">0.057</div>
                           <div class="metric-change" id="ndvi-change"></div>
                         </div>
 
@@ -410,7 +411,7 @@
     
     <div class="footer">
         <p>Data: ESA Copernicus Sentinel-2 | Analysis: Google Earth Engine</p>
-        <p class="last-update">Last updated: June 2025</p>
+        <p class="last-update">Last updated: October 2025</p>
         <p>
             <a href="https://github.com/andjames/baogang-monitor" target="_blank">View Code</a> | 
             <a href="https://www.linkedin.com/in/andrewpjames/" target="_blank">Connect on LinkedIn</a> |
@@ -421,7 +422,7 @@
     <script>
 
         // Initialize map
-        const map = L.map('map').setView([40.6589, 109.8405], 11);
+        const map = L.map('map').setView([40.635497, 109.685119], 11);
         
         // Add dark theme tiles
         L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
@@ -431,8 +432,8 @@
         
         // Add facility markers
         const facilities = [
-            { name: 'Main Processing Plant', coords: [40.6589, 109.8405], color: '#ff4444' },
             { name: 'Tailings Dam (Toxic Lake)', coords: [40.635497, 109.685119], color: '#ff8800' },
+            { name: 'Main Processing Plant', coords: [40.6589, 109.8405], color: '#ff4444' },
             { name: 'Reference Area', coords: [40.7, 109.9], color: '#44ff44' }
         ];
         
@@ -542,8 +543,8 @@
                 const response = await fetch('./data/historical_monthly.json?t=' + Date.now());
                 const json = await response.json();
 
-                // Prefer root level main_plant object if present
-                const plantData = json.main_plant || (json.historical_monthly && json.historical_monthly.main_plant) || {};
+                // Prefer root level tailings_dam object if present
+                const plantData = json.tailings_dam || (json.historical_monthly && json.historical_monthly.tailings_dam) || {};
                 const years = Object.keys(plantData).sort();
                 if (years.length === 0) return;
 
