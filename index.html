@@ -181,6 +181,37 @@
             grid-column: 1 / -1;
         }
 
+        .key-metrics-content {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+            gap: 1.5rem;
+            align-items: start;
+        }
+
+        .key-metrics-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .visual-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .visual-panel h3 {
+            font-size: 1rem;
+            font-weight: 500;
+            margin-bottom: 1rem;
+            color: #fff;
+        }
+
+        .visual-panel p {
+            color: #888;
+            font-size: 0.9rem;
+        }
+        
         .footer {
             background: #1a1a1a;
             padding: 2rem;
@@ -250,8 +281,12 @@
           text-align: center;
         }
         @media (max-width: 968px) {
-            .image-comparison {
+            .key-metrics-content {
                 grid-template-columns: 1fr;
+            }
+
+            .visual-panel h3 {
+                margin-top: 1rem;
             }
         }
     </style>
@@ -273,45 +308,65 @@
         
         <div class="card">
             <h2>Key Environmental Metrics</h2>
-            <div class="metrics">
-                <div class="metric">
-                  <div class="metric-label">
-                    Moisture Index
-                    <span class="info" title="NDMI (Normalized Difference Moisture Index) estimates vegetation water content. Range: -1 (dry) to 1 (wet).">ⓘ</span>
-                  </div>
-                  <div class="metric-value" id="ndmi-value">-0.038</div>
-                  <div class="metric-change" id="ndmi-change"></div>
-                </div>
+            <div class="key-metrics-content">
+                <div class="key-metrics-panel">
+                    <div class="metrics">
+                        <div class="metric">
+                          <div class="metric-label">
+                            Moisture Index
+                            <span class="info" title="NDMI (Normalized Difference Moisture Index) estimates vegetation water content. Range: -1 (dry) to 1 (wet).">ⓘ</span>
+                          </div>
+                          <div class="metric-value" id="ndmi-value">-0.038</div>
+                          <div class="metric-change" id="ndmi-change"></div>
+                        </div>
 
-                <div class="metric">
-                  <div class="metric-label">
-                    Bare Soil
-                    <span class="info" title="BSI (Bare Soil Index) highlights exposed soil using visible and SWIR bands. Higher values = more bare ground.">ⓘ</span>
-                  </div>
-                  <div class="metric-value" id="bsi-value">0.084</div>
-                  <div class="metric-change" id="bsi-change"></div>
-                </div>
+                        <div class="metric">
+                          <div class="metric-label">
+                            Bare Soil
+                            <span class="info" title="BSI (Bare Soil Index) highlights exposed soil using visible and SWIR bands. Higher values = more bare ground.">ⓘ</span>
+                          </div>
+                          <div class="metric-value" id="bsi-value">0.084</div>
+                          <div class="metric-change" id="bsi-change"></div>
+                        </div>
 
-                <div class="metric">
-                  <div class="metric-label">
-                    Vegetation Health
-                    <span class="info" title="NDVI (Normalized Difference Vegetation Index) indicates plant greenness. Range: -1 to 1, with 0.2–0.8 = healthy vegetation.">ⓘ</span>
-                  </div>
-                  <div class="metric-value" id="ndvi-value">0.129</div>
-                  <div class="metric-change" id="ndvi-change"></div>
-                </div>
+                        <div class="metric">
+                          <div class="metric-label">
+                            Vegetation Health
+                            <span class="info" title="NDVI (Normalized Difference Vegetation Index) indicates plant greenness. Range: -1 to 1, with 0.2–0.8 = healthy vegetation.">ⓘ</span>
+                          </div>
+                          <div class="metric-value" id="ndvi-value">0.129</div>
+                          <div class="metric-change" id="ndvi-change"></div>
+                        </div>
 
-                <div class="metric">
-                  <div class="metric-label">
-                    Snow Cover
-                    <span class="info" title="Based on NDSI (Normalized Difference Snow Index). Indicates presence of snow.">ⓘ</span>
-                  </div>
-                  <div class="metric-value">None</div>
+                        <div class="metric">
+                          <div class="metric-label">
+                            Snow Cover
+                            <span class="info" title="Based on NDSI (Normalized Difference Snow Index). Indicates presence of snow.">ⓘ</span>
+                          </div>
+                          <div class="metric-value">None</div>
+                        </div>
+                    </div>
+                    <div class="alert-box">
+                        <h3>⚠️ Environmental Alert</h3>
+                        <p>No winter snow cover detected in 2025. Toxic dust from tailings can now spread year-round, affecting communities downwind.</p>
+                    </div>
                 </div>
-            </div>
-            <div class="alert-box">
-                <h3>⚠️ Environmental Alert</h3>
-                <p>No winter snow cover detected in 2025. Toxic dust from tailings can now spread year-round, affecting communities downwind.</p>
+                <div class="visual-panel">
+                    <h3>Visual Comparison</h3>
+                    <div class="image-comparison">
+                        <div>
+                            <img src="./images/tailings-winter-2024.png" alt="2024 Winter">
+                            <div class="image-label">2024: Normal snow cover</div>
+                        </div>
+                        <div>
+                            <img src="./images/tailings-winter-2025.png" alt="2025 Winter">
+                            <div class="image-label">2025: No snow - exposed tailings</div>
+                        </div>
+                    </div>
+                    <p>
+                        Sentinel-2 true color imagery showing the difference in winter conditions
+                    </p>
+                </div>
             </div>
         </div>
         
@@ -322,21 +377,16 @@
             </div>
         </div>
 
-        <div class="card">
-            <h2>Visual Comparison</h2>
-            <div class="image-comparison">
-                <div>
-                    <img src="./images/tailings-winter-2024.png" alt="2024 Winter">
-                    <div class="image-label">2024: Normal snow cover</div>
+        <div class="card full-width">
+            <h2>Historical Metric Trends</h2>
+            <div class="mini-charts">
+                <div class="mini-chart">
+                    <canvas id="bareSoilChart"></canvas>
                 </div>
-                <div>
-                    <img src="./images/tailings-winter-2025.png" alt="2025 Winter">
-                    <div class="image-label">2025: No snow - exposed tailings</div>
+                <div class="mini-chart">
+                    <canvas id="vegetationChart"></canvas>
                 </div>
             </div>
-            <p style="color: #888; font-size: 0.9rem;">
-                Sentinel-2 true color imagery showing the difference in winter conditions
-            </p>
         </div>
 
         <div class="card full-width">
