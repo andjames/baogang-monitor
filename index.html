@@ -156,6 +156,26 @@
             height: 300px;
             margin-top: 1rem;
         }
+
+        .mini-charts {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .mini-chart {
+            background: #0f0f0f;
+            border: 1px solid #2a2a2a;
+            border-radius: 8px;
+            padding: 0.75rem;
+            height: 220px;
+        }
+
+        .mini-chart canvas {
+            width: 100%;
+            height: 100%;
+        }
         
         .footer {
             background: #1a1a1a;
@@ -293,6 +313,24 @@
                 <canvas id="timeChart"></canvas>
             </div>
         </div>
+
+        <div class="card">
+            <h2>Historical Metric Trends</h2>
+            <div class="mini-charts">
+                <div class="mini-chart">
+                    <canvas id="moistureChart"></canvas>
+                </div>
+                <div class="mini-chart">
+                    <canvas id="bareSoilChart"></canvas>
+                </div>
+                <div class="mini-chart">
+                    <canvas id="vegetationChart"></canvas>
+                </div>
+                <div class="mini-chart">
+                    <canvas id="snowChart"></canvas>
+                </div>
+            </div>
+        </div>
         
         <div class="card">
             <h2>Visual Comparison</h2>
@@ -352,59 +390,103 @@
         });
         
         // Create time series chart
+        const chartPalette = [
+            { border: '#4a9eff', background: 'rgba(74, 158, 255, 0.12)' },
+            { border: '#ff4444', background: 'rgba(255, 68, 68, 0.12)' },
+            { border: '#44ff44', background: 'rgba(68, 255, 68, 0.12)' },
+            { border: '#ffaa44', background: 'rgba(255, 170, 68, 0.12)' }
+        ];
+
+        const chartOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    labels: {
+                        color: '#fff'
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: {
+                        color: '#333'
+                    },
+                    ticks: {
+                        color: '#888'
+                    }
+                },
+                y: {
+                    grid: {
+                        color: '#333'
+                    },
+                    ticks: {
+                        color: '#888'
+                    }
+                }
+            }
+        };
+
         const ctx = document.getElementById('timeChart').getContext('2d');
         const timeChart = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-                datasets: [
-                    {
-                        label: '2024 Moisture Index',
-                        data: [0.298, 0.290, -0.047, -0.021, 0.009, 0.021, 0.035, 0.067, 0.055, 0.040, -0.003, -0.007],
-                        borderColor: '#4a9eff',
-                        backgroundColor: 'rgba(74, 158, 255, 0.1)',
-                        tension: 0.3
-                    },
-                    {
-                        label: '2025 Moisture Index',
-                        data: [-0.012, -0.041, -0.041, -0.049, 0.024, null, null, null, null, null, null, null],
-                        borderColor: '#ff4444',
-                        backgroundColor: 'rgba(255, 68, 68, 0.1)',
-                        tension: 0.3
-                    }
-                ]
+                labels: [],
+                datasets: []
             },
             options: {
-                responsive: true,
-                maintainAspectRatio: false,
+                ...chartOptions,
                 plugins: {
+                    ...chartOptions.plugins,
                     title: {
                         display: true,
                         text: 'Moisture Index Comparison',
                         color: '#fff'
-                    },
-                    legend: {
-                        labels: {
-                            color: '#fff'
-                        }
                     }
                 },
-                scales: {
-                    x: {
-                        grid: {
-                            color: '#333'
-                        },
-                        ticks: {
-                            color: '#888'
+                scales: chartOptions.scales
+            }
+        });
+
+        function createMetricChart(canvasId, title, overrides = {}) {
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            return new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: []
+                },
+                options: {
+                    ...chartOptions,
+                    plugins: {
+                        ...chartOptions.plugins,
+                        title: {
+                            display: true,
+                            text: title,
+                            color: '#fff',
+                            font: { size: 14 }
                         }
                     },
-                    y: {
-                        grid: {
-                            color: '#333'
-                        },
-                        ticks: {
-                            color: '#888'
-                        }
+                    scales: {
+                        ...chartOptions.scales,
+                        ...overrides.scales
+                    }
+                }
+            });
+        }
+
+        const moistureChart = createMetricChart('moistureChart', 'Moisture Index');
+        const bareSoilChart = createMetricChart('bareSoilChart', 'Bare Soil Index');
+        const vegetationChart = createMetricChart('vegetationChart', 'Vegetation Health (NDVI)');
+        const snowChart = createMetricChart('snowChart', 'Snow Cover Presence', {
+            scales: {
+                y: {
+                    ...chartOptions.scales.y,
+                    suggestedMin: -0.1,
+                    suggestedMax: 1.1,
+                    ticks: {
+                        ...chartOptions.scales.y.ticks,
+                        callback: (value) => (value === 1 ? 'Present' : value === 0 ? 'Absent' : value)
                     }
                 }
             }
@@ -425,12 +507,6 @@
                 const labels = plantData[years[0]].months;
                 timeChart.data.labels = labels;
 
-                const colors = [
-                    { border: '#4a9eff', background: 'rgba(74, 158, 255, 0.1)' },
-                    { border: '#ff4444', background: 'rgba(255, 68, 68, 0.1)' },
-                    { border: '#44ff44', background: 'rgba(68, 255, 68, 0.1)' }
-                ];
-
                 timeChart.data.datasets = years.map((yr, idx) => {
                     const yearMonths = plantData[yr].months;
                     const ndmi = plantData[yr].ndmi;
@@ -438,7 +514,7 @@
                         const i = yearMonths.indexOf(m);
                         return i !== -1 ? ndmi[i] : null;
                     });
-                    const c = colors[idx % colors.length];
+                    const c = chartPalette[idx % chartPalette.length];
                     return {
                         label: `${yr} Moisture Index`,
                         data,
@@ -449,6 +525,52 @@
                 });
 
                 timeChart.update();
+
+                const metricConfigs = [
+                    { key: 'ndmi', chart: moistureChart, label: 'Moisture Index' },
+                    { key: 'bsi', chart: bareSoilChart, label: 'Bare Soil Index' },
+                    { key: 'ndvi', chart: vegetationChart, label: 'Vegetation Health' }
+                ];
+
+                metricConfigs.forEach(({ key, chart, label }) => {
+                    chart.data.labels = labels;
+                    chart.data.datasets = years.map((yr, idx) => {
+                        const yearMonths = plantData[yr].months;
+                        const series = plantData[yr][key] || [];
+                        const data = labels.map(m => {
+                            const i = yearMonths.indexOf(m);
+                            return i !== -1 ? series[i] ?? null : null;
+                        });
+                        const c = chartPalette[idx % chartPalette.length];
+                        return {
+                            label: `${yr} ${label}`,
+                            data,
+                            borderColor: c.border,
+                            backgroundColor: c.background,
+                            tension: 0.3,
+                            spanGaps: true
+                        };
+                    });
+                    chart.update();
+                });
+
+                const snowPeriods = (json.annotations && json.annotations.snow_period) || {};
+                snowChart.data.labels = labels;
+                snowChart.data.datasets = years.map((yr, idx) => {
+                    const snowMonths = snowPeriods[yr] || [];
+                    const data = labels.map(m => snowMonths.includes(m) ? 1 : 0);
+                    const c = chartPalette[idx % chartPalette.length];
+                    return {
+                        label: `${yr} Snow Cover`,
+                        data,
+                        borderColor: c.border,
+                        backgroundColor: c.background,
+                        stepped: true,
+                        tension: 0,
+                        spanGaps: true
+                    };
+                });
+                snowChart.update();
             } catch (err) {
                 console.error('Error loading historical data:', err);
             }
