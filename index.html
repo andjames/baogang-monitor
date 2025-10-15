@@ -55,16 +55,32 @@
         
         .dashboard {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            grid-template-areas:
+                "location metrics"
+                "temporal visual"
+                "historical historical";
             gap: 1.5rem;
             padding: 1.5rem;
             max-width: 1400px;
             margin: 0 auto;
         }
-        
+
+        .location-card { grid-area: location; }
+        .metrics-card { grid-area: metrics; }
+        .temporal-card { grid-area: temporal; }
+        .visual-card { grid-area: visual; }
+        .historical-card { grid-area: historical; }
+
         @media (max-width: 968px) {
             .dashboard {
                 grid-template-columns: 1fr;
+                grid-template-areas:
+                    "location"
+                    "metrics"
+                    "temporal"
+                    "visual"
+                    "historical";
             }
         }
         
@@ -298,15 +314,15 @@
     </div>
     
     <div class="dashboard">
-        <div class="card">
+        <div class="card location-card">
             <h2>Facility Location</h2>
             <div id="map"></div>
             <p style="margin-top: 1rem; color: #888; font-size: 0.9rem;">
                 📍 Inner Mongolia, China | 11 sq km tailings dam | World's largest REE processor
             </p>
         </div>
-        
-        <div class="card">
+
+        <div class="card metrics-card">
             <h2>Key Environmental Metrics</h2>
             <div class="key-metrics-content">
                 <div class="key-metrics-panel">
@@ -370,7 +386,7 @@
             </div>
         </div>
         
-        <div class="card">
+        <div class="card temporal-card">
             <h2>Temporal Analysis</h2>
             <div class="chart-container">
                 <canvas id="timeChart"></canvas>
@@ -390,6 +406,18 @@
         </div>
 
         <div class="card full-width">
+            <h2>Historical Metric Trends</h2>
+            <div class="mini-charts">
+                <div class="mini-chart">
+                    <canvas id="bareSoilChart"></canvas>
+                </div>
+                <div class="mini-chart">
+                    <canvas id="vegetationChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="card historical-card">
             <h2>Historical Metric Trends</h2>
             <div class="mini-charts">
                 <div class="mini-chart">
