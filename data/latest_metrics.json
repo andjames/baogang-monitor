@@ -1,10 +1,11 @@
 {
-  "timestamp": "2025-10-27T18:29:12.824945",
-  "image_date": "2025-10-24",
+  "timestamp": "2025-10-28T18:42:40.768229",
+  "error": "The Google Earth Engine client library (ee) is not installed.",
+  "image_date": "Unavailable",
   "metrics": {
-    "ndvi": 0.089,
-    "ndmi": 0.0242,
-    "bsi": 0.0162
+    "ndvi": 0.057,
+    "ndmi": -0.189,
+    "bsi": 0.481
   },
   "changes_vs_2024": {
     "ndvi": "-6.6%",
