@@ -1,10 +1,11 @@
 {
-  "timestamp": "2026-09-21T21:45:16.516064",
-  "image_date": "2026-09-19",
+  "timestamp": "2026-09-22T03:38:46.244441",
+  "error": "type NoneType doesn't define __round__ method",
+  "image_date": "Unavailable",
   "metrics": {
-    "ndvi": 0.1306,
-    "ndmi": 0.1129,
-    "bsi": -0.0536
+    "ndvi": 0.057,
+    "ndmi": -0.189,
+    "bsi": 0.481
   },
   "changes_vs_2024": {
     "ndvi": "-6.6%",
